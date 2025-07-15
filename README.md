@@ -1,62 +1,54 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa
-</h1>
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+# How to Reproduce the Bug
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+This guide explains how to reproduce the performance issue on the custom MedusaJS API endpoint.
 
-## Compatibility
+## Steps
 
-This starter is compatible with versions >= 2 of `@medusajs/medusa`. 
+1. **Start the project**
 
-## Getting Started
+   Launch the project as you would for any standard MedusaJS setup.
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
+2. **Seed the database**
 
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
+   Run the following command:
 
-## What is Medusa
+   ```bash
+   yarn seed
+   ```
 
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
+   > **Note:**  
+   > The seeding process takes some time.  
+   > It creates **10,000 products** (each with a variant) and a price list containing **10,000 prices**.
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
+3. **Start the MedusaJS server**
 
-## Community & Contributions
+   Start your MedusaJS server as usual.
 
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
+4. **Call the custom API**
 
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
+   Make a POST request to the following endpoint:
 
-## Other channels
+   ```
+   /admin/price-lists/:idPriceList/add-variant-price
+   ```
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+   with the following JSON body:
+
+   ```json
+   {
+     "variant_id": "variant_01K07Y11347ZTXJJ4AMAKQ0N6C",
+     "amount": "100",
+     "currency_code": "eur"
+   }
+   ```
+
+   > ⚠️ **Important:**  
+   > Replace `"variant_id"` with an actual variant ID from your database.
+
+   You can use a tool like **Postman** to send the request.
+
+5. **Expected result**
+
+   In my tests, the request took **27 seconds** to execute.  
+   (This is the performance issue to investigate.)
